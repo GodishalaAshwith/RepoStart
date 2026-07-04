@@ -7,16 +7,20 @@ class VectorStore:
     def __init__(self, model_name: str = "all-MiniLM-L6-v2"):
         self.model = SentenceTransformer(model_name)
         # all-MiniLM-L6-v2 generates 384-dimensional embeddings
-        self.dimension = self.model.get_sentence_embedding_dimension()
+        self.dimension = self.model.get_embedding_dimension()
         # Initialize a flat L2 index
         self.index = faiss.IndexFlatL2(self.dimension)
         self.chunks = []
         
-    def _chunk_text(self, text: str, max_words: int = 150) -> list[str]:
-        """Simple word-based chunking."""
+    def _chunk_text(self, text: str, max_words: int = 150, overlap: int = 30) -> list[str]:
+        """Word-based chunking with overlap for better context retention."""
         words = text.split()
         chunks = []
-        for i in range(0, len(words), max_words):
+        step = max_words - overlap
+        if step <= 0:
+            step = max_words
+            
+        for i in range(0, len(words), step):
             chunk = " ".join(words[i:i + max_words])
             chunks.append(chunk)
         return chunks

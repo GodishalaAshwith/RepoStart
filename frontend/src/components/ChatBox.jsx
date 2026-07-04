@@ -28,7 +28,8 @@ const ChatBox = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:8000/api/query', {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+      const response = await axios.post(`${apiUrl}/api/query`, {
         query: userMessage
       });
       
