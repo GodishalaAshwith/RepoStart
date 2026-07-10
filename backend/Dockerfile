@@ -4,6 +4,7 @@ WORKDIR /app
 
 # Install dependencies
 COPY requirements.txt .
+RUN pip install --default-timeout=100 --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu
 RUN pip install --default-timeout=100 --no-cache-dir -r requirements.txt
 
 # Copy the app code
