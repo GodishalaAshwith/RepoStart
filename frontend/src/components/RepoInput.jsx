@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Github, ArrowRight, Loader2 } from 'lucide-react';
+import { FolderGit2, ArrowRight, Loader2 } from 'lucide-react';
 import axios from 'axios';
 
 const RepoInput = ({ onIngestSuccess }) => {
@@ -30,7 +30,7 @@ const RepoInput = ({ onIngestSuccess }) => {
   return (
     <div className="glass-panel">
       <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: 0 }}>
-        <Github size={24} />
+        <FolderGit2 size={24} />
         Connect Repository
       </h2>
       <p style={{ color: '#94a3b8', marginBottom: '1.5rem' }}>
