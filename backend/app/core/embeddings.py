@@ -13,16 +13,29 @@ class VectorStore:
         self.chunks = []
         
     def _chunk_text(self, text: str, max_words: int = 150, overlap: int = 30) -> list[str]:
-        """Word-based chunking with overlap for better context retention."""
-        words = text.split()
+        """Markdown-aware chunking with word-overlap fallback for large sections."""
+        # Split by Markdown headers (e.g., #, ##, ###) at the start of a line
+        sections = re.split(r'\n(?=#+ )', text)
+        
         chunks = []
-        step = max_words - overlap
-        if step <= 0:
-            step = max_words
-            
-        for i in range(0, len(words), step):
-            chunk = " ".join(words[i:i + max_words])
-            chunks.append(chunk)
+        for section in sections:
+            section = section.strip()
+            if not section:
+                continue
+                
+            words = section.split()
+            # If the section is small enough, keep it as one cohesive chunk
+            if len(words) <= max_words:
+                chunks.append(section)
+            else:
+                # Fallback to word-level overlap chunking for huge sections
+                step = max_words - overlap
+                if step <= 0:
+                    step = max_words
+                for i in range(0, len(words), step):
+                    chunk = " ".join(words[i:i + max_words])
+                    chunks.append(chunk)
+                    
         return chunks
 
     def ingest_texts(self, texts: list[str]) -> int:
