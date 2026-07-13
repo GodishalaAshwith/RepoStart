@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Loader2, Bot, User } from 'lucide-react';
 import axios from 'axios';
-
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 const ChatBox = () => {
   const [messages, setMessages] = useState([
     { type: 'ai', content: 'Repository indexed! What would you like to know about the codebase?', source: null }
@@ -68,8 +69,10 @@ const ChatBox = () => {
               {msg.content}
             </div>
             {msg.source && (
-              <div className="message-source">
-                {msg.source}
+              <div className="message-source" style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)', padding: '1rem', borderRadius: '0.5rem', marginTop: '0.5rem', overflowX: 'auto' }}>
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  {msg.source}
+                </ReactMarkdown>
                 {msg.confidence !== undefined && (
                   <div style={{ marginTop: '0.5rem' }}>
                     <span className="confidence-badge">
