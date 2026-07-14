@@ -8,7 +8,7 @@ MODEL_NAME = "Qwen/Qwen2.5-0.5B-Instruct"
 class LLMGenerator:
     def __init__(self):
         self.generator = None
-        self._initialize_pipeline()
+        # Lazy initialization
 
     def _initialize_pipeline(self):
         try:
@@ -26,6 +26,9 @@ class LLMGenerator:
             self.generator = None
 
     def generate_answer(self, query: str, context: str) -> str:
+        if not self.generator:
+            self._initialize_pipeline()
+            
         if not self.generator:
             return "Here is the most relevant snippet from the documentation (LLM generation failed):"
 

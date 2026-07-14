@@ -5,12 +5,19 @@ import re
 
 class VectorStore:
     def __init__(self, model_name: str = "all-MiniLM-L6-v2"):
-        self.model = SentenceTransformer(model_name)
-        # all-MiniLM-L6-v2 generates 384-dimensional embeddings
-        self.dimension = self.model.get_embedding_dimension()
-        # Initialize a flat L2 index
-        self.index = faiss.IndexFlatL2(self.dimension)
+        self.model_name = model_name
+        self.model = None
+        self.dimension = None
+        self.index = None
         self.chunks = []
+        
+    def _lazy_init(self):
+        if self.model is None:
+            print(f"Initializing embedding model {self.model_name}...")
+            self.model = SentenceTransformer(self.model_name)
+            self.dimension = self.model.get_embedding_dimension()
+            self.index = faiss.IndexFlatL2(self.dimension)
+            print("Embedding model initialized successfully.")
         
     def _chunk_text(self, text: str, max_words: int = 150, overlap: int = 30) -> list[str]:
         """Markdown-aware chunking with word-overlap fallback for large sections."""
@@ -40,6 +47,7 @@ class VectorStore:
 
     def ingest_texts(self, texts: list[str]) -> int:
         """Chunks texts, creates embeddings, and adds them to the FAISS index."""
+        self._lazy_init()
         all_chunks = []
         for text in texts:
             all_chunks.extend(self._chunk_text(text))
@@ -58,6 +66,7 @@ class VectorStore:
         
     def query(self, query_text: str, k: int = 3) -> list[tuple[str, float]]:
         """Searches the index for the top k most similar chunks to the query."""
+        self._lazy_init()
         if not self.chunks:
             return []
             
