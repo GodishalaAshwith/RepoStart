@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException
 from app.models.schemas import IngestRequest, IngestResponse, QueryRequest, QueryResponse
 from app.core.github_fetcher import GithubFetcher
 from app.core.embeddings import vector_store
+from app.core.llm import llm_generator
 
 router = APIRouter()
 fetcher = GithubFetcher()
@@ -44,8 +45,10 @@ async def query_docs(request: QueryRequest):
         # A full LLM might synthesize an answer, but the requirement is:
         # "Return highly accurate, context-matched documentation snippets directly to the user, bypassing conversational chatbot fluff"
         
+        generated_answer = llm_generator.generate_answer(request.query, best_snippet)
+        
         return QueryResponse(
-            answer="Here is the most relevant snippet from the documentation:",
+            answer=generated_answer,
             source_snippet=best_snippet,
             confidence=confidence
         )
